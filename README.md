@@ -22,6 +22,7 @@ This script uses Python & OpenCV as its main component to perform this task. The
 
 We use OpenCV to write text on the certificate templates, OpenCV is a popular framework for computer vision.
 
+pip install opencv-python
 
 ## How to use it?
 
