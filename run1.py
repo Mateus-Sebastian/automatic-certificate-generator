@@ -2,6 +2,8 @@ import os, cv2, unicodedata
 from PIL import Image
 
 list_of_names = []
+list_of_matriculas = []
+list_of_cursos = []
 
 def delete_old_data():
     for i in os.listdir("generated-certificates/"):
@@ -15,16 +17,44 @@ def cleanup_data():
         for line in f:
             normalized_name = normalizar(line.strip())
             list_of_names.append(normalized_name)
+    
+    with open('matricula-data.txt', encoding='utf-8') as f:
+        for line in f:
+            list_of_matriculas.append(line.strip())
+    
+    with open('curso-data.txt', encoding='utf-8') as f:
+        for line in f:
+            normalized_curso = normalizar(line.strip())
+            list_of_cursos.append(normalized_curso)
 
 def normalizar(text):
     normalized_text = unicodedata.normalize('NFKD', text)
     return ''.join([c for c in normalized_text if not unicodedata.combining(c)])
 
 def generate_certificates():
-    for index, name in enumerate(list_of_names):
+    for index in range(len(list_of_names)):
+        name = list_of_names[index]
+        matricula = list_of_matriculas[index]
+        curso = list_of_cursos[index]
+        
         certificate_template_image = cv2.imread("template.png")
-        cv2.putText(certificate_template_image, name.strip(), (780, 560), cv2.FONT_HERSHEY_SIMPLEX, 1, (82, 18, 8), 2, cv2.LINE_AA)
-        cv2.imwrite(os.path.join("generated-certificates", f"{name}.jpg"), certificate_template_image)
+        
+        # Cor preta em BGR (OpenCV usa BGR em vez de RGB)
+        cor_preta = (0, 0, 0)
+        
+        # Adiciona nome
+        cv2.putText(certificate_template_image, name.strip(), (232, 736), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_preta, 2, cv2.LINE_AA)
+        
+        # Adiciona matrícula
+        cv2.putText(certificate_template_image, matricula.strip(), (912, 736), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_preta, 2, cv2.LINE_AA)
+        
+        # Adiciona curso
+        cv2.putText(certificate_template_image, curso.strip(), (340, 769), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor_preta, 2, cv2.LINE_AA)
+        
+        cv2.imwrite(os.path.join("generated-certificates", f"{name}_2022_1.jpg"), certificate_template_image)
         print("Processando {} / {}".format(index + 1, len(list_of_names)))
 
     for file in os.listdir("generated-certificates/"):
